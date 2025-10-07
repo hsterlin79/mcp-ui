@@ -10,6 +10,7 @@ import { generateFlightResultsHTML } from './utils/htmlResource.js';
 import { getFlightRequestSchemaAsZod, getFlightResponseSchemaAsZod } from './utils/schema.js';
 import { getAvailableFlights } from './utils/data.js';
 import { getFlightSearchFormHtml, getAddressSelfContainedHtml } from './utils/formLoader.js';
+import { LwcHandler } from './lwcHandler.js';
 
 const app = express();
 const port = 3000;
@@ -138,6 +139,21 @@ app.post('/mcp', async (req, res) => {
       };
     });
 
+    server.registerTool('getStaticLwc', {
+      title: 'Get Static LWC Component',
+      description: 'Static LWC Component'
+    }, async ({ originCity, destinationCity, dateOfTravel, filters }) => {
+      const uiResource = createUIResource({
+        uri: 'ui://lwcComponent',
+        content: { type: 'externalUrl', iframeUrl: `http://localhost:${port}/lwc` },
+        encoding: 'text',
+      });
+
+      return {
+        content: [uiResource],
+      };
+    });
+
     server.registerTool('showRemoteDom', {
       title: 'Show Remote DOM',
       description: 'Shows todays weather forecast using remote DOM script.',
@@ -238,6 +254,22 @@ app.get('/mcp', handleSessionRequest);
 
 // DELETE handles explicit session termination from the client.
 app.delete('/mcp', handleSessionRequest);
+
+// Initialize LWC handler
+console.log('Initializing LWC handler...');
+const lwcHandler = new LwcHandler();
+
+// GET endpoint to serve the LWC component
+app.get('/lwc', (req, res) => {
+  try {
+    const html = lwcHandler.generateLwcHtml();
+    res.setHeader('Content-Type', 'text/html');
+    res.send(html);
+  } catch (error) {
+    console.error('Error serving LWC component:', error);
+    res.status(500).send(error instanceof Error ? error.message : 'Error loading LWC component');
+  }
+});
 
 app.listen(port, () => {
   console.log(`TypeScript MCP server listening at http://localhost:${port}`);
