@@ -8,7 +8,7 @@
     "build": "tsc",
     "build:lwc": "rollup --config rollup.config.js",
     "start": "node dist/index.js",
-    "dev": "vite-node src/index.ts"
+    "dev": "vite-node --watch src/index.ts"
   },
   "keywords": [],
   "author": "",

@@ -9,6 +9,7 @@ import { randomUUID } from 'crypto';
 import { generateFlightResultsHTML } from './utils/htmlResource.js';
 import { getFlightRequestSchemaAsZod, getFlightResponseSchemaAsZod } from './utils/schema.js';
 import { getAvailableFlights } from './utils/data.js';
+import { getFlightSearchFormHtml, getAddressSelfContainedHtml } from './utils/formLoader.js';
 import { LwcHandler } from './lwcHandler.js';
 
 const app = express();
@@ -84,7 +85,10 @@ app.post('/mcp', async (req, res) => {
       const flightDataHtml = generateFlightResultsHTML(flightData, originCity, destinationCity, dateOfTravel);
       const uiResource = createUIResource({
         uri: 'ui://raw-html-demo',
-        content: { type: 'rawHtml', htmlString: flightDataHtml },
+        content: {
+            type: 'rawHtml',
+            htmlString: flightDataHtml
+        },
         encoding: 'text',
       });
       return {
@@ -101,7 +105,10 @@ app.post('/mcp', async (req, res) => {
       // This is the only MCP-UI specific code in this example
       const uiResource = createUIResource({
         uri: 'ui://external-url-demo',
-        content: { type: 'externalUrl', iframeUrl: 'https://example.com' },
+        content: {
+            type: 'externalUrl',
+            iframeUrl: 'https://example.com'
+        },
         encoding: 'text',
       });
 
@@ -121,7 +128,10 @@ app.post('/mcp', async (req, res) => {
       // TODO: Create a new UEM UIResource type
       const uiResource = createUIResource({
         uri: 'ui://uem-demo',
-        content: { type: 'rawHtml', htmlString: flightDataHtml },
+        content: {
+            type: 'rawHtml',
+            htmlString: flightDataHtml
+        },
         encoding: 'text',
       });
       return {
@@ -160,6 +170,52 @@ app.post('/mcp', async (req, res) => {
           type: 'remoteDom',
           script: remoteDomScript,
           framework: 'react',
+        },
+        encoding: 'text',
+      });
+
+      return {
+        content: [uiResource],
+      };
+    });
+
+    server.registerTool('showFlightSearchForm', {
+      title: 'Show Flight Search Form',
+      description: 'Displays an interactive form to search for flights with tool selection.',
+      inputSchema: {},
+    }, async () => {
+        console.log(`Running Flight Search form tool to show User a rich UI for flight search `);
+
+        const formHtml = getFlightSearchFormHtml();
+
+      const uiResource = createUIResource({
+        uri: 'ui://flight-search-form',
+        content: {
+          type: 'rawHtml',
+          htmlString: formHtml
+        },
+        encoding: 'text',
+      });
+
+      return {
+        content: [uiResource],
+      };
+    });
+
+    server.registerTool('addressManager', {
+      title: 'Address Manager',
+      description: 'Self-contained address manager that allows entering and displaying address information in one UI.',
+      inputSchema: {},
+    }, async () => {
+      console.log('Running Address Manager - self-contained form and display');
+
+      const html = getAddressSelfContainedHtml();
+
+      const uiResource = createUIResource({
+        uri: 'ui://address-manager',
+        content: {
+          type: 'rawHtml',
+          htmlString: html
         },
         encoding: 'text',
       });
