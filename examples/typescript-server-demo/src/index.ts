@@ -143,11 +143,16 @@ app.post('/mcp', async (req, res) => {
       title: 'Get Static LWC Component',
       description: 'Static LWC Component'
     }, async ({ originCity, destinationCity, dateOfTravel, filters }) => {
+      const html = lwcHandler.generateComponentAsRawHtml('x-app', {});
       const uiResource = createUIResource({
-        uri: 'ui://lwcComponent',
-        content: { type: 'externalUrl', iframeUrl: `http://localhost:${port}/lwc` },
+        uri: 'ui://lwcComponentAsRawHtml',
+        content: {
+            type: 'rawHtml',
+            htmlString: html
+        },
         encoding: 'text',
       });
+
       return {
         content: [uiResource],
       };
@@ -161,7 +166,7 @@ app.post('/mcp', async (req, res) => {
 
       const uiResource = createUIResource({
         uri: 'ui://lwcComponent',
-        content: { type: 'externalUrl', iframeUrl: `http://localhost:${port}/lwc` },
+        content: { type: 'externalUrl', iframeUrl: `http://localhost:${port}/lwc/x-flightDetails` },
         encoding: 'text',
       });
       return {
