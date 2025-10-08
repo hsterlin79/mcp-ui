@@ -148,7 +148,24 @@ app.post('/mcp', async (req, res) => {
         content: { type: 'externalUrl', iframeUrl: `http://localhost:${port}/lwc` },
         encoding: 'text',
       });
+      console.log(uiResource);
+      return {
+        content: [uiResource],
+      };
+    });
 
+    server.registerTool('getFlightDetailsAndRenderinLWC', {
+      title: 'Get LWC Component',
+      description: 'LWC Component',
+      inputSchema: getFlightRequestSchemaAsZod()
+    }, async ({ originCity, destinationCity, dateOfTravel, filters }) => {
+
+      const uiResource = createUIResource({
+        uri: 'ui://lwcComponent',
+        content: { type: 'externalUrl', iframeUrl: `http://localhost:${port}/lwc` },
+        encoding: 'text',
+      });
+      console.log(uiResource);
       return {
         content: [uiResource],
       };
