@@ -274,6 +274,37 @@ app.delete('/mcp', handleSessionRequest);
 console.log('Initializing LWC handler...');
 const lwcHandler = new LwcHandler();
 
+// GET endpoint to serve flight details with dynamic data
+app.get('/flightDetails', (req, res) => {
+  try {
+    const { value } = req.query;
+    let flightData = null;
+    
+    // Parse flight data from query parameter
+    if (value) {
+      try {
+        // If value is a JSON string, parse it
+        if (typeof value === 'string') {
+          flightData = JSON.parse(value);
+        } else {
+          flightData = value;
+        }
+        console.log('Flight data from URL:', flightData);
+      } catch (parseError) {
+        console.error('Error parsing flight data from URL:', parseError);
+        // Continue with default data if parsing fails
+      }
+    }
+    
+    const html = lwcHandler.generateLwcHtml(flightData);
+    res.setHeader('Content-Type', 'text/html');
+    res.send(html);
+  } catch (error) {
+    console.error('Error serving flight details:', error);
+    res.status(500).send(error instanceof Error ? error.message : 'Error loading flight details');
+  }
+});
+
 // GET endpoint to serve the LWC component
 app.get('/lwc', (req, res) => {
   try {
