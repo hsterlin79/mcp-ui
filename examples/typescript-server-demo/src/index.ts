@@ -148,7 +148,6 @@ app.post('/mcp', async (req, res) => {
         content: { type: 'externalUrl', iframeUrl: `http://localhost:${port}/lwc` },
         encoding: 'text',
       });
-      console.log(uiResource);
       return {
         content: [uiResource],
       };
@@ -165,7 +164,6 @@ app.post('/mcp', async (req, res) => {
         content: { type: 'externalUrl', iframeUrl: `http://localhost:${port}/lwc` },
         encoding: 'text',
       });
-      console.log(uiResource);
       return {
         content: [uiResource],
       };
