@@ -177,4 +177,41 @@ export class LwcHandler {
       throw new Error(`Error loading LWC component ${componentName}: ${error instanceof Error ? error.message : 'Unknown error'}. Make sure to run "pnpm run build:lwc" first.`);
     }
   }
+
+  generateComponentAsRawHtml(componentName: string, data?: any): string {
+    const parsed = this.parseComponentName(componentName);
+    if (!parsed) {
+      throw new Error(`Invalid component name format: ${componentName}. Expected format: namespace-componentName`);
+    }
+
+    if (!this.componentExists(parsed.namespace, parsed.component)) {
+      throw new Error(`Component not found: ${componentName}. Check if ${parsed.namespace}/${parsed.component} exists in modules directory.`);
+    }
+
+    try {
+      // Read the bundled LWC JavaScript
+      const lwcBundle = readFileSync(this.lwcBundlePath, 'utf8');
+
+      // Create HTML that loads the specific LWC component
+      return `
+        <div class="container">
+            <div id="lwc-container">
+                <p>Loading ${componentName} component...</p>
+            </div>
+        </div>
+        <script>
+            console.log('About to load LWC bundle for ${componentName}');
+
+            // Inject component data if provided
+            ${data ? `window.componentData = ${JSON.stringify(data)};` : ''}
+            window.targetComponent = '${componentName}';
+
+            ${lwcBundle}
+            console.log('LWC bundle loaded for ${componentName}');
+        </script>
+        `;
+    } catch (error) {
+      throw new Error(`Error loading LWC component ${componentName}: ${error instanceof Error ? error.message : 'Unknown error'}. Make sure to run "pnpm run build:lwc" first.`);
+    }
+  }
 }
