@@ -35,8 +35,16 @@ export default class FlightDetails extends LightningElement {
     }
 
     connectedCallback() {
-        // Handle both direct array and nested flights structure
-        const flights = Array.isArray(this.value) ? this.value : (this.value?.flights || []);
+        // Check if data is provided via window object (from URL parameters)
+        let flights = [];
+        
+        if (window.componentData) {
+            // Data from URL parameters
+            flights = Array.isArray(window.componentData) ? window.componentData : (window.componentData?.flights || []);
+        } else if (this.value) {
+            // Data from parent component
+            flights = Array.isArray(this.value) ? this.value : (this.value?.flights || []);
+        }
         
         this.flightData = flights.map((flight) => ({
             ...flight,
