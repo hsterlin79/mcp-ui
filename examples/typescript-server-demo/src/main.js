@@ -1,15 +1,33 @@
 import { createElement } from 'lwc';
 import App from 'x/app';
+import FlightDetails from 'x/flightDetails';
 
 console.log('LWC main.js loaded');
+
+// Component registry
+const componentRegistry = {
+  'x-app': App,
+  'x-flightDetails': FlightDetails
+};
 
 function mountLWC() {
   console.log('Looking for lwc-container');
   const container = document.getElementById('lwc-container');
   console.log('Container found:', container);
+  
   if (container) {
-    console.log('Creating LWC element');
-    const elm = createElement('x-app', { is: App });
+    // Determine which component to load
+    const targetComponent = window.targetComponent || 'x-app';
+    const componentClass = componentRegistry[targetComponent];
+    
+    if (!componentClass) {
+      console.error(`Component not found: ${targetComponent}`);
+      container.innerHTML = `<p>Error: Component ${targetComponent} not found</p>`;
+      return true;
+    }
+    
+    console.log(`Creating LWC element for ${targetComponent}`);
+    const elm = createElement(targetComponent, { is: componentClass });
     console.log('LWC element created:', elm);
     container.innerHTML = ''; // Clear loading message
     container.appendChild(elm);
