@@ -10,9 +10,10 @@ export class LwcHandler {
 
   /**
    * Generates HTML content for the LWC component
+   * @param flightData Optional flight data to inject into the component
    * @returns HTML string with embedded LWC bundle
    */
-  generateLwcHtml(): string {
+  generateLwcHtml(flightData?: any): string {
     try {
       // Read the bundled LWC JavaScript
       const lwcBundle = readFileSync(this.lwcBundlePath, 'utf8');
@@ -50,6 +51,10 @@ export class LwcHandler {
     </div>
     <script>
         console.log('About to load LWC bundle');
+        
+        // Inject flight data if provided
+        ${flightData ? `window.flightData = ${JSON.stringify(flightData)};` : ''}
+        
         ${lwcBundle}
         console.log('LWC bundle loaded');
     </script>
